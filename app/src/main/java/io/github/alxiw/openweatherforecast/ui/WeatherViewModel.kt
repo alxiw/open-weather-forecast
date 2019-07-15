@@ -26,16 +26,10 @@ class WeatherViewModel @Inject constructor(private val repository: WeatherReposi
         it.networkErrors
     }
 
-    /**
-     * Search a repository based on a query string.
-     */
     fun searchForecasts(queryString: String) {
         queryLiveData.postValue(queryString)
     }
 
-    /**
-     * Get the last query value.
-     */
     fun lastQueryValue(): String? = queryLiveData.value
 
 }
