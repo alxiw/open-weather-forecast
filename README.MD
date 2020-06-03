@@ -6,12 +6,14 @@ Simple Android application which represents a wrapper for [OpenWeatherMap API](h
 
 ## Dependencies
 
-* [Kotlin](https://github.com/JetBrains/kotlin) 1.3.41
+* [Kotlin](https://github.com/JetBrains/kotlin) 1.3.72
 * [Dagger](https://github.com/google/dagger) 2.23.2
-* [Retrofit](https://github.com/square/retrofit) and [Gson Converter](https://github.com/square/retrofit/tree/master/retrofit-converters/gson) 2.6.0
-* [OkHttp Logging Interceptor](https://github.com/square/okhttp/tree/master/okhttp-logging-interceptor) 4.0.0
+* [Retrofit](https://github.com/square/retrofit) 2.9.0
+* [OkHttp Logging Interceptor](https://github.com/square/okhttp/tree/master/okhttp-logging-interceptor) 4.7.2
+* [RxJava](https://github.com/ReactiveX/RxJava) 2.2.19
+* [RxAndroid](https://github.com/ReactiveX/RxAndroid) 2.1.1
 * [RecyclerViewHelper](https://github.com/nisrulz/recyclerviewhelper) 25.4.0
-* [Glide](https://github.com/bumptech/glide) 4.9.0
+* [Glide](https://github.com/bumptech/glide) 4.11.0
 * [Realm](https://github.com/realm/realm-java) 5.12.0
 
 ## Building

@@ -1,14 +1,19 @@
 package io.github.alxiw.openweatherforecast.data
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import io.github.alxiw.openweatherforecast.api.ForecastResponse
 import io.github.alxiw.openweatherforecast.api.OpenWeatherMapService
+import io.github.alxiw.openweatherforecast.db.WeatherLocalCache
 import io.github.alxiw.openweatherforecast.model.Forecast
 import io.github.alxiw.openweatherforecast.model.ForecastResult
-import io.github.alxiw.openweatherforecast.api.ForecastResponse
-import io.github.alxiw.openweatherforecast.db.WeatherLocalCache
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import io.realm.Realm
+import java.util.*
+import kotlin.collections.ArrayList
 
 class WeatherRepository(
     private val service: OpenWeatherMapService,
@@ -38,46 +43,39 @@ class WeatherRepository(
         })
     }
 
+    @SuppressLint("CheckResult")
     private fun searchForecasts(
         service: OpenWeatherMapService,
         query: String,
         onSuccess: (repos: List<Forecast>) -> Unit,
         onError: (error: String) -> Unit
     ) {
+        service.loadWeather(query)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { response: ForecastResponse ->
+                    val city = response.city.name
+                    val responseList = response.list
 
-        service.loadWeather(query).enqueue(
-            object : Callback<ForecastResponse> {
-                override fun onFailure(call: Call<ForecastResponse>?, t: Throwable) {
-                    onError(t.message ?: "unknown error")
-                }
+                    val list = ArrayList<Forecast>()
 
-                override fun onResponse(
-                    call: Call<ForecastResponse>?,
-                    response: Response<ForecastResponse>
-                ) {
-                    if (response.isSuccessful) {
-                        val city = response.body()?.city?.name ?: ""
-                        val responseList = response.body()?.list?: emptyList()
-
-                        val list = ArrayList<Forecast>()
-
-                        responseList.forEach {
-                            val forecast = Forecast()
-                            forecast.city = city.toLowerCase()
-                            forecast.head = it.weather.first().head
-                            forecast.description = it.weather.first().description
-                            forecast.date = it.date.toString()
-                            forecast.temperature = it.main.temperature
-                            forecast.imageUrl = convertIconIdToUrl(it.weather.first().image)
-                            list.add(forecast)
-                        }
-                        onSuccess(list)
-                    } else {
-                        onError(response.errorBody()?.string() ?: "Unknown error")
+                    responseList.forEach {
+                        val forecast = Forecast()
+                        forecast.city = city.toLowerCase()
+                        forecast.head = it.weather.first().head
+                        forecast.description = it.weather.first().description
+                        forecast.date = it.date.toString()
+                        forecast.temperature = it.main.temperature
+                        forecast.imageUrl = convertIconIdToUrl(it.weather.first().image)
+                        list.add(forecast)
                     }
+                    onSuccess(list)
+                },
+                { e: Throwable ->
+                    onError(e.message ?: "Unknown error")
                 }
-            }
-        )
+            )
     }
 
     private fun convertIconIdToUrl(iconId: String) = "https://openweathermap.org/img/w/$iconId.png"

@@ -1,6 +1,6 @@
 package io.github.alxiw.openweatherforecast.api
 
-import retrofit2.Call
+import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -10,6 +10,5 @@ interface OpenWeatherMapService {
     fun loadWeather(
         @Query("q") cityId: String,
         @Query("units") units: String = "metric"
-    ): Call<ForecastResponse>
-
+    ): Single<ForecastResponse>
 }
