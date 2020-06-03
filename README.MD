@@ -7,7 +7,7 @@ Simple Android application which represents a wrapper for [OpenWeatherMap API](h
 ## Dependencies
 
 * [Kotlin](https://github.com/JetBrains/kotlin) 1.3.72
-* [Dagger](https://github.com/google/dagger) 2.23.2
+* [Dagger](https://github.com/google/dagger) 2.28
 * [Retrofit](https://github.com/square/retrofit) 2.9.0
 * [OkHttp Logging Interceptor](https://github.com/square/okhttp/tree/master/okhttp-logging-interceptor) 4.7.2
 * [RxJava](https://github.com/ReactiveX/RxJava) 2.2.19
