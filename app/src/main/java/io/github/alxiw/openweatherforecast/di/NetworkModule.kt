@@ -1,0 +1,37 @@
+package io.github.alxiw.openweatherforecast.di
+
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import io.github.alxiw.openweatherforecast.api.AuthInterceptor
+import io.github.alxiw.openweatherforecast.api.OpenWeatherMapService
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import org.koin.dsl.module
+import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import retrofit2.converter.gson.GsonConverterFactory
+
+private const val BASE_URL = "http://api.openweathermap.org/"
+
+val networkModule = module {
+
+    factory { GsonBuilder().setLenient().create() as Gson }
+    factory {
+        with(OkHttpClient.Builder()) {
+            addInterceptor(AuthInterceptor())
+            addInterceptor(HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.BODY
+            })
+            build()
+        } as OkHttpClient
+    }
+    factory {
+        with(Retrofit.Builder()) {
+            baseUrl(BASE_URL)
+            client(get())
+            addConverterFactory(GsonConverterFactory.create(get()))
+            addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            build()
+        }.create(OpenWeatherMapService::class.java) as OpenWeatherMapService
+    }
+}

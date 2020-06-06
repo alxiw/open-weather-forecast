@@ -1,19 +1,15 @@
 package io.github.alxiw.openweatherforecast.data
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import io.github.alxiw.openweatherforecast.api.ForecastConverter.fromResponse
 import io.github.alxiw.openweatherforecast.api.ForecastResponse
 import io.github.alxiw.openweatherforecast.api.OpenWeatherMapService
 import io.github.alxiw.openweatherforecast.db.WeatherLocalCache
 import io.github.alxiw.openweatherforecast.model.Forecast
 import io.github.alxiw.openweatherforecast.model.ForecastResult
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import io.realm.Realm
-import java.util.*
-import kotlin.collections.ArrayList
 
 class WeatherRepository(
     private val service: OpenWeatherMapService,
@@ -23,8 +19,15 @@ class WeatherRepository(
     private val networkErrors = MutableLiveData<String>()
     private var isRequestInProgress = false
 
-    fun search(query: String): ForecastResult {
-        requestAndSaveData(query)
+    fun getByKey(key: String): Forecast? {
+        val data = cache.forecastsByKey(key)
+        return data.first()
+    }
+
+    fun search(query: String, cached: Boolean): ForecastResult {
+        if (!cached) {
+            requestAndSaveData(query)
+        }
         val data = cache.forecastsByCity(query)
         return ForecastResult(data, networkErrors)
     }
@@ -33,14 +36,20 @@ class WeatherRepository(
         if (isRequestInProgress) return
 
         isRequestInProgress = true
-        searchForecasts(service, query, { forecasts ->
-            cache.insert(forecasts) {
+        searchForecasts(
+            service,
+            query,
+            { forecasts ->
+                cache.insert(forecasts) {
+                    networkErrors.postValue(null)
+                    isRequestInProgress = false
+                }
+            },
+            { error ->
+                networkErrors.postValue(error)
                 isRequestInProgress = false
             }
-        }, { error ->
-            networkErrors.postValue(error)
-            isRequestInProgress = false
-        })
+        )
     }
 
     @SuppressLint("CheckResult")
@@ -55,29 +64,11 @@ class WeatherRepository(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { response: ForecastResponse ->
-                    val city = response.city.name
-                    val responseList = response.list
-
-                    val list = ArrayList<Forecast>()
-
-                    responseList.forEach {
-                        val forecast = Forecast()
-                        forecast.city = city.toLowerCase()
-                        forecast.head = it.weather.first().head
-                        forecast.description = it.weather.first().description
-                        forecast.date = it.date.toString()
-                        forecast.temperature = it.main.temperature
-                        forecast.imageUrl = convertIconIdToUrl(it.weather.first().image)
-                        list.add(forecast)
-                    }
-                    onSuccess(list)
+                    onSuccess(fromResponse(response))
                 },
                 { e: Throwable ->
                     onError(e.message ?: "Unknown error")
                 }
             )
     }
-
-    private fun convertIconIdToUrl(iconId: String) = "https://openweathermap.org/img/w/$iconId.png"
-
 }

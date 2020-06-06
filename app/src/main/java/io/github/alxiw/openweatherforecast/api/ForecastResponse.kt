@@ -8,6 +8,7 @@ data class ForecastResponse(
     @SerializedName("list")
     val list: List<ForecastResponseListItem>
 ) {
+
     data class ForecastResponseCity (
         @SerializedName("name")
         val name: String
@@ -21,12 +22,13 @@ data class ForecastResponse(
         @SerializedName("weather")
         val weather: List<ForecastResponseListItemWeather>
     ) {
+
         data class ForecastResponseListItemMain(
             @SerializedName("temp")
             val temperature: Double
         )
 
-        class ForecastResponseListItemWeather(
+        data class ForecastResponseListItemWeather(
             @SerializedName("main")
             val head: String,
             @SerializedName("description")
@@ -36,8 +38,3 @@ data class ForecastResponse(
         )
     }
 }
-
-
-
-
-

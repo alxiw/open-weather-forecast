@@ -8,7 +8,7 @@ interface OpenWeatherMapService {
 
     @GET("data/2.5/forecast")
     fun loadWeather(
-        @Query("q") cityId: String,
+        @Query("q") city: String,
         @Query("units") units: String = "metric"
     ): Single<ForecastResponse>
 }

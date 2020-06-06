@@ -1,18 +1,12 @@
 package io.github.alxiw.openweatherforecast.di
 
-import dagger.Module
-import dagger.Provides
 import io.github.alxiw.openweatherforecast.db.WeatherLocalCache
+import org.koin.dsl.module
+import java.util.concurrent.Executor
 import java.util.concurrent.Executors
-import javax.inject.Singleton
 
-@Module
-class DatabaseModule {
+val databaseModule = module {
 
-    @Provides
-    @Singleton
-    fun provideCache(): WeatherLocalCache {
-        return WeatherLocalCache(Executors.newSingleThreadExecutor())
-    }
-
+    factory { Executors.newSingleThreadExecutor() as Executor }
+    factory { WeatherLocalCache(get()) as WeatherLocalCache }
 }
