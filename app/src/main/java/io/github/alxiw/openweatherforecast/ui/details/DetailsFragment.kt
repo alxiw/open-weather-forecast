@@ -8,7 +8,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.bumptech.glide.Glide
 import io.github.alxiw.openweatherforecast.R
-import io.github.alxiw.openweatherforecast.model.Forecast
+import io.github.alxiw.openweatherforecast.data.model.Forecast
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class DetailsFragment : DialogFragment() {

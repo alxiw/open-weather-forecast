@@ -7,7 +7,7 @@ import com.bumptech.glide.Glide
 import com.xwray.groupie.kotlinandroidextensions.GroupieViewHolder
 import com.xwray.groupie.kotlinandroidextensions.Item
 import io.github.alxiw.openweatherforecast.R
-import io.github.alxiw.openweatherforecast.model.Forecast
+import io.github.alxiw.openweatherforecast.data.model.Forecast
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.round

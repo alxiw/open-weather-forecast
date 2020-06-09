@@ -1,4 +1,4 @@
-package io.github.alxiw.openweatherforecast.api
+package io.github.alxiw.openweatherforecast.data.api
 
 import io.reactivex.Single
 import retrofit2.http.GET

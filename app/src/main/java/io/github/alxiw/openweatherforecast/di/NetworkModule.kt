@@ -2,8 +2,8 @@ package io.github.alxiw.openweatherforecast.di
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import io.github.alxiw.openweatherforecast.api.AuthInterceptor
-import io.github.alxiw.openweatherforecast.api.OpenWeatherMapService
+import io.github.alxiw.openweatherforecast.data.api.AuthInterceptor
+import io.github.alxiw.openweatherforecast.data.api.OpenWeatherMapService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.dsl.module

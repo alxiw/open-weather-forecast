@@ -6,8 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import io.github.alxiw.openweatherforecast.data.WeatherRepository
-import io.github.alxiw.openweatherforecast.model.Forecast
-import io.github.alxiw.openweatherforecast.model.ForecastResult
+import io.github.alxiw.openweatherforecast.data.model.Forecast
+import io.github.alxiw.openweatherforecast.data.model.ForecastResult
 import io.realm.RealmResults
 
 class ForecastsViewModel(

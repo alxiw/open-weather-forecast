@@ -1,4 +1,4 @@
-package io.github.alxiw.openweatherforecast.db
+package io.github.alxiw.openweatherforecast.data.db
 
 import io.realm.RealmResults
 import io.realm.RealmChangeListener

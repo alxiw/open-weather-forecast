@@ -1,4 +1,4 @@
-package io.github.alxiw.openweatherforecast.model
+package io.github.alxiw.openweatherforecast.data.model
 
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey

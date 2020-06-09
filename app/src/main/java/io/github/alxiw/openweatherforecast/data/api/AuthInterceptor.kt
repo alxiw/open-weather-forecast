@@ -1,4 +1,4 @@
-package io.github.alxiw.openweatherforecast.api
+package io.github.alxiw.openweatherforecast.data.api
 
 import io.github.alxiw.openweatherforecast.BuildConfig
 import okhttp3.Interceptor

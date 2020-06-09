@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.kotlinandroidextensions.GroupieViewHolder
 import io.github.alxiw.openweatherforecast.R
-import io.github.alxiw.openweatherforecast.model.Forecast
+import io.github.alxiw.openweatherforecast.data.model.Forecast
 import io.github.alxiw.openweatherforecast.ui.details.DetailsFragment
 import io.github.alxiw.openweatherforecast.util.hide
 import io.github.alxiw.openweatherforecast.util.show

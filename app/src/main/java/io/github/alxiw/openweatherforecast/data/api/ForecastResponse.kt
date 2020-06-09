@@ -1,4 +1,4 @@
-package io.github.alxiw.openweatherforecast.api
+package io.github.alxiw.openweatherforecast.data.api
 
 import com.google.gson.annotations.SerializedName
 

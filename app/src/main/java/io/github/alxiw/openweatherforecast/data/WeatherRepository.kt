@@ -2,12 +2,12 @@ package io.github.alxiw.openweatherforecast.data
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.MutableLiveData
-import io.github.alxiw.openweatherforecast.api.ForecastConverter.fromResponse
-import io.github.alxiw.openweatherforecast.api.ForecastResponse
-import io.github.alxiw.openweatherforecast.api.OpenWeatherMapService
-import io.github.alxiw.openweatherforecast.db.WeatherLocalCache
-import io.github.alxiw.openweatherforecast.model.Forecast
-import io.github.alxiw.openweatherforecast.model.ForecastResult
+import io.github.alxiw.openweatherforecast.data.model.ForecastConverter.fromResponse
+import io.github.alxiw.openweatherforecast.data.api.ForecastResponse
+import io.github.alxiw.openweatherforecast.data.api.OpenWeatherMapService
+import io.github.alxiw.openweatherforecast.data.db.WeatherLocalCache
+import io.github.alxiw.openweatherforecast.data.model.Forecast
+import io.github.alxiw.openweatherforecast.data.model.ForecastResult
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 

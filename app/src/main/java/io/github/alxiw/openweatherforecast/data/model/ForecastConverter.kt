@@ -1,6 +1,6 @@
-package io.github.alxiw.openweatherforecast.api
+package io.github.alxiw.openweatherforecast.data.model
 
-import io.github.alxiw.openweatherforecast.model.Forecast
+import io.github.alxiw.openweatherforecast.data.api.ForecastResponse
 import java.util.*
 
 object ForecastConverter {
@@ -16,7 +16,10 @@ object ForecastConverter {
             forecast.description = it.weather.first().description
             forecast.date = it.date.toString()
             forecast.temperature = it.main.temperature
-            forecast.imageUrl = convertIconIdToUrl(it.weather.first().image)
+            forecast.imageUrl =
+                convertIconIdToUrl(
+                    it.weather.first().image
+                )
             forecast
         }
     }
