@@ -11,7 +11,7 @@ open class Forecast : RealmObject() {
     var city: String = ""
     var head: String = ""
     var description: String = ""
-    var date: String = ""
+    var date: Long = 0L
     var temperature: Double = 0.0
     var imageUrl: String = ""
 }

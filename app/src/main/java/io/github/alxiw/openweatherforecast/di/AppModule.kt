@@ -13,7 +13,7 @@ private const val PREF_FILE_NAME = "weather_prefs"
 val appModule = module {
 
     single { (get() as Context).getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE) as SharedPreferences }
-    factory { WeatherRepository(get(), get()) as WeatherRepository }
-    viewModel { ForecastsViewModel(get(), get()) as ForecastsViewModel }
-    viewModel { DetailsViewModel(get()) as DetailsViewModel }
+    factory { WeatherRepository(get(), get()) }
+    viewModel { ForecastsViewModel(get(), get()) }
+    viewModel { DetailsViewModel(get()) }
 }

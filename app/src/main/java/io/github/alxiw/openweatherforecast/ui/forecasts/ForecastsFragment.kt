@@ -1,6 +1,7 @@
 package io.github.alxiw.openweatherforecast.ui.forecasts
 
 import android.os.Bundle
+import android.os.Handler
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -23,6 +24,7 @@ import io.github.alxiw.openweatherforecast.ui.details.DetailsFragment
 import io.github.alxiw.openweatherforecast.util.hide
 import io.github.alxiw.openweatherforecast.util.show
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.concurrent.TimeUnit
 
 class ForecastsFragment : Fragment() {
 
@@ -157,6 +159,11 @@ class ForecastsFragment : Fragment() {
         emptyList.hide()
         recyclerView.hide()
         progressBar.show()
+        Handler().postDelayed({
+            if (viewModel.forecasts.value?.size == 0) {
+                showEmptyList()
+            }
+        }, TimeUnit.SECONDS.toMillis(10))
     }
 
     companion object {

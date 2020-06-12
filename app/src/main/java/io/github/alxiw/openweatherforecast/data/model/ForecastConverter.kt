@@ -2,6 +2,7 @@ package io.github.alxiw.openweatherforecast.data.model
 
 import io.github.alxiw.openweatherforecast.data.api.ForecastResponse
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 object ForecastConverter {
 
@@ -14,12 +15,9 @@ object ForecastConverter {
             forecast.city = city.toLowerCase(Locale.US)
             forecast.head = it.weather.first().head
             forecast.description = it.weather.first().description
-            forecast.date = it.date.toString()
+            forecast.date = TimeUnit.SECONDS.toMillis(it.date)
             forecast.temperature = it.main.temperature
-            forecast.imageUrl =
-                convertIconIdToUrl(
-                    it.weather.first().image
-                )
+            forecast.imageUrl = convertIconIdToUrl(it.weather.first().image)
             forecast
         }
     }

@@ -4,6 +4,7 @@ import android.app.Application
 import io.github.alxiw.openweatherforecast.di.appModule
 import io.github.alxiw.openweatherforecast.di.databaseModule
 import io.github.alxiw.openweatherforecast.di.networkModule
+import io.github.alxiw.openweatherforecast.data.WeatherWorker
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import org.koin.android.ext.koin.androidContext
@@ -29,10 +30,12 @@ class App : Application() {
             .schemaVersion(DB_VERSION)
             .build()
         Realm.setDefaultConfiguration(realmConfig)
+        WeatherWorker.init(applicationContext, DB_CLEAR_INTERVAL_HOURS)
     }
 
     companion object {
         private const val DB_NAME = "openweatherforecast.realm"
         private const val DB_VERSION = 0L
+        private const val DB_CLEAR_INTERVAL_HOURS = 12L
     }
 }

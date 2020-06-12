@@ -15,7 +15,7 @@ class ForecastsViewModel(
     private val prefs: SharedPreferences
 ) : ViewModel() {
 
-    var cached : Boolean = false
+    private var cached : Boolean = false
 
     private val queryLiveData = MutableLiveData<String>()
     private val forecastResult: LiveData<ForecastResult> = Transformations.map(queryLiveData) {

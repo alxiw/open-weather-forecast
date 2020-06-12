@@ -30,7 +30,7 @@ class ForecastItem(
                 R.string.temperature_template,
                 round(forecast.temperature.toFloat()).toInt().toString()
             )
-            date.text = SimpleDateFormat(DATE_PATTERN, Locale.getDefault()).format(Date(forecast.date.toLong() * 1000))
+            date.text = SimpleDateFormat(DATE_PATTERN, Locale.getDefault()).format(Date(forecast.date))
 
             Glide.with(itemView.context)
                 .load(forecast.imageUrl)
