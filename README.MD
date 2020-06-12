@@ -2,7 +2,7 @@
 
 Simple Android application which represents a wrapper for [OpenWeatherMap API](https://openweathermap.org/api) and developed mostly to practice with MVVM architectural pattern, LiveData and ViewModel from [Android Architecture Components](https://github.com/googlesamples/android-architecture-components) and Realm database. The application shows 5 day weather forecast for every 3 hours for the city entered in the corresponding field. Also, the application handles configuration changes and implements repository pattern storing cache data locally.
 
-<img src="img/sample.jpg" alt="drawing" width="200"/>
+<img src="img/sample.png" alt="drawing" width="200"/>
 
 ## Dependencies
 
