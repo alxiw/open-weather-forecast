@@ -76,6 +76,12 @@ dependencies {
     // db
     implementation "io.realm:android-adapters:2.0.0"
 
+    // log
+    implementation "com.jakewharton.timber:timber:4.5.1"
+
+    // leaks
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:2.3"
+
     // unit tests
     testImplementation "junit:junit:4.13"
 

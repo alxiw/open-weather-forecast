@@ -10,6 +10,7 @@ import io.realm.RealmConfiguration
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
+import timber.log.Timber
 
 class App : Application() {
 
@@ -19,6 +20,9 @@ class App : Application() {
             androidLogger()
             androidContext(this@App)
             modules(listOf(appModule, networkModule, databaseModule))
+        }
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
         }
         initRealm(this)
     }
@@ -30,6 +34,7 @@ class App : Application() {
             .schemaVersion(DB_VERSION)
             .build()
         Realm.setDefaultConfiguration(realmConfig)
+        Timber.i("Weather Worker: init with %d hours interval", DB_CLEAR_INTERVAL_HOURS)
         WeatherWorker.init(applicationContext, DB_CLEAR_INTERVAL_HOURS)
     }
 

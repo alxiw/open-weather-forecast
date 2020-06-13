@@ -46,6 +46,6 @@ class ForecastItem(
     override fun getLayout() = R.layout.item_forecast
 
     companion object {
-        private const val DATE_PATTERN = "dd MMMM YYYY, HH:mm"
+        const val DATE_PATTERN = "dd MMMM YYYY, HH:mm"
     }
 }
