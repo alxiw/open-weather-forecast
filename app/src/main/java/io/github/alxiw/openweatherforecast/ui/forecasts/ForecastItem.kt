@@ -34,7 +34,7 @@ class ForecastItem(
 
             Glide.with(itemView.context)
                 .load(forecast.imageUrl)
-                .placeholder(R.drawable.ic_placeholder_black_24dp)
+                .placeholder(R.drawable.ic_hourglass)
                 .into(image)
         }
 

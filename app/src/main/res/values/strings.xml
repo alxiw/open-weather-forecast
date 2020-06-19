@@ -3,4 +3,6 @@
     <string name="no_results">😨 No results</string>
     <string name="search_hint">City</string>
     <string name="temperature_template">%1$s °С</string>
+    <string name="header_previous">Previous</string>
+    <string name="header_future">Future</string>
 </resources>

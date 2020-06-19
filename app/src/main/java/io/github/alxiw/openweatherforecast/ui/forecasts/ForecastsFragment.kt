@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.xwray.groupie.GroupAdapter
+import com.xwray.groupie.Section
 import com.xwray.groupie.kotlinandroidextensions.GroupieViewHolder
 import io.github.alxiw.openweatherforecast.R
 import io.github.alxiw.openweatherforecast.data.model.Forecast
@@ -49,17 +50,35 @@ class ForecastsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
+        val previousHeader = ForecastHeaderFactory.create(context, ForecastHeaderFactory.Type.PREVIOUS)
+        val futureHeader = ForecastHeaderFactory.create(context, ForecastHeaderFactory.Type.FUTURE)
         viewModel.forecasts.observe(this.viewLifecycleOwner, Observer {
             if (it.size != 0) {
                 showForecasts()
             } else {
                 showLoading()
             }
-            val list = ArrayList<Forecast>()
+            val previousList = ArrayList<ForecastItem>()
+            val futureList = ArrayList<ForecastItem>()
             it.forEach {item ->
-                list.add(item)
+                val forecastItem = ForecastItem(item, ::onForecastClicked)
+                if (System.currentTimeMillis() >= item.date) {
+                    previousList.add(forecastItem)
+                } else {
+                    futureList.add(forecastItem)
+                }
             }
-            adapter.update(list.map { forecast -> ForecastItem(forecast, ::onForecastClicked) })
+            val sections = ArrayList<Section>()
+            if (previousList.isNotEmpty()) {
+                val previousSection = Section(previousHeader, previousList)
+                sections.add(previousSection)
+                val futureSection = Section(futureHeader, futureList)
+                sections.add(futureSection)
+            } else {
+                val futureSection = Section(futureList)
+                sections.add(futureSection)
+            }
+            adapter.update(sections)
         })
         viewModel.networkErrors.observe(this.viewLifecycleOwner, Observer {it ->
             it?.let {

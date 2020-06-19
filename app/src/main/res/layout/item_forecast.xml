@@ -36,7 +36,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/item_right_guideline"
-        app:srcCompat="@drawable/ic_placeholder_black_24dp" />
+        app:srcCompat="@drawable/ic_hourglass" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/item_right_guideline"
