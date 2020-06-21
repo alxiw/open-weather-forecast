@@ -37,7 +37,7 @@ class DetailsFragment : DialogFragment() {
             Glide.with(this)
                 .asDrawable()
                 .load(it)
-                .placeholder(R.drawable.ic_hourglass)
+                .placeholder(R.drawable.ic_placeholder)
                 .into(image!!)
         }
 
