@@ -25,7 +25,7 @@ class WeatherWorker(
     private fun clearOldForecasts() {
         val realm = Realm.getDefaultInstance()
         val bound = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1)
-        val boundFormat = SimpleDateFormat(ForecastItem.DATE_PATTERN, Locale.getDefault()).format(Date(bound))
+        val boundFormat = SimpleDateFormat(ForecastItem.DATE_PATTERN, Locale.US).format(Date(bound))
         Timber.i("Weather Worker: boundary date is %s", boundFormat)
             realm.executeTransaction {
                 val old: RealmResults<Forecast> = it

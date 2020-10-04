@@ -30,7 +30,7 @@ class ForecastItem(
                 R.string.temperature_template,
                 round(forecast.temperature.toFloat()).toInt().toString()
             )
-            date.text = SimpleDateFormat(DATE_PATTERN, Locale.getDefault()).format(Date(forecast.date))
+            date.text = SimpleDateFormat(DATE_PATTERN, Locale.US).format(Date(forecast.date))
 
             Glide.with(itemView.context)
                 .load(forecast.imageUrl)
@@ -46,6 +46,6 @@ class ForecastItem(
     override fun getLayout() = R.layout.item_forecast
 
     companion object {
-        const val DATE_PATTERN = "dd MMMM YYYY, HH:mm"
+        const val DATE_PATTERN = "dd MMMM yyyy, HH:mm"
     }
 }

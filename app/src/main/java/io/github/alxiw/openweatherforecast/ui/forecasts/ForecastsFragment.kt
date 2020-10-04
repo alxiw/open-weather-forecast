@@ -43,15 +43,25 @@ class ForecastsFragment : Fragment() {
         restoreSavedInstanceState(savedInstanceState)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_forecasts, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
-        val previousHeader = ForecastHeaderFactory.create(context, ForecastHeaderFactory.Type.PREVIOUS)
-        val futureHeader = ForecastHeaderFactory.create(context, ForecastHeaderFactory.Type.FUTURE)
+        val previousHeader = ForecastHeaderFactory.create(
+            context,
+            ForecastHeaderFactory.Type.PREVIOUS
+        )
+        val futureHeader = ForecastHeaderFactory.create(
+            context,
+            ForecastHeaderFactory.Type.FUTURE
+        )
         viewModel.forecasts.observe(this.viewLifecycleOwner, Observer {
             if (it.size != 0) {
                 showForecasts()
@@ -60,7 +70,7 @@ class ForecastsFragment : Fragment() {
             }
             val previousList = ArrayList<ForecastItem>()
             val futureList = ArrayList<ForecastItem>()
-            it.forEach {item ->
+            it.forEach { item ->
                 val forecastItem = ForecastItem(item, ::onForecastClicked)
                 if (System.currentTimeMillis() >= item.date) {
                     previousList.add(forecastItem)
@@ -80,7 +90,7 @@ class ForecastsFragment : Fragment() {
             }
             adapter.update(sections)
         })
-        viewModel.networkErrors.observe(this.viewLifecycleOwner, Observer {it ->
+        viewModel.networkErrors.observe(this.viewLifecycleOwner, Observer { it ->
             it?.let {
                 if (viewModel.forecasts.value?.size == 0) {
                     showEmptyList()
@@ -126,6 +136,7 @@ class ForecastsFragment : Fragment() {
 
     private fun initSearch(query: String) {
         searchForecast.setText(query)
+        searchForecast.setSelection(searchForecast.text.length)
         searchForecast.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_GO) {
                 updateRepoListFromInput()
