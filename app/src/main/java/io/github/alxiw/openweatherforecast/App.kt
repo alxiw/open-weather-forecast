@@ -1,6 +1,7 @@
 package io.github.alxiw.openweatherforecast
 
 import android.app.Application
+import com.facebook.stetho.Stetho
 import io.github.alxiw.openweatherforecast.di.appModule
 import io.github.alxiw.openweatherforecast.di.databaseModule
 import io.github.alxiw.openweatherforecast.di.networkModule
@@ -25,6 +26,7 @@ class App : Application() {
             Timber.plant(Timber.DebugTree())
         }
         initRealm(this)
+        initStetho()
     }
 
     private fun initRealm(app: App) {
@@ -36,6 +38,19 @@ class App : Application() {
         Realm.setDefaultConfiguration(realmConfig)
         Timber.i("Weather Worker: init with %d hours interval", DB_CLEAR_INTERVAL_HOURS)
         WeatherWorker.init(applicationContext, DB_CLEAR_INTERVAL_HOURS)
+    }
+
+    private fun initStetho() {
+        if (!BuildConfig.DEBUG) {
+            return
+        }
+        val initializer = Stetho.newInitializerBuilder(this).apply {
+            // Chrome DevTools
+            enableWebKitInspector(Stetho.defaultInspectorModulesProvider(this@App))
+            // Command line interface
+            enableDumpapp(Stetho.defaultDumperPluginsProvider(this@App))
+        }.build()
+        Stetho.initialize(initializer)
     }
 
     companion object {
