@@ -26,7 +26,9 @@ class App : Application() {
             Timber.plant(Timber.DebugTree())
         }
         initRealm(this)
-        initStetho()
+        if (BuildConfig.DEBUG) {
+            initStetho()
+        }
     }
 
     private fun initRealm(app: App) {

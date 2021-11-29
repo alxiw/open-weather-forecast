@@ -8,14 +8,13 @@ An Android application which represents a wrapper for [OpenWeather API](https://
 
 ## Dependencies
 
-* [Kotlin](https://github.com/JetBrains/kotlin) 1.3.72
+* [Kotlin](https://github.com/JetBrains/kotlin) 1.6.0
 * [Koin](https://github.com/InsertKoinIO/koin) 2.0.1
 * [Retrofit](https://github.com/square/retrofit) 2.9.0
-* [OkHttp](https://github.com/square/okhttp) 4.7.2
-* [RxJava](https://github.com/ReactiveX/RxJava) 2.2.19
-* [Groupie](https://github.com/lisawray/groupie) 2.8.0
-* [Glide](https://github.com/bumptech/glide) 4.11.0
-* [Realm](https://github.com/realm/realm-java) 7.0.0
+* [RxJava](https://github.com/ReactiveX/RxJava) 2.2.21
+* [Glide](https://github.com/bumptech/glide) 4.12.0
+* [Groupie](https://github.com/lisawray/groupie) 2.9.0
+* [Realm](https://github.com/realm/realm-java) 10.8.1
 
 ## Building
 

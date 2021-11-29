@@ -20,7 +20,7 @@ val networkModule = module {
         with(OkHttpClient.Builder()) {
             addInterceptor(AuthInterceptor())
             addInterceptor(HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
+                level = HttpLoggingInterceptor.Level.BASIC
             })
             build()
         } as OkHttpClient
