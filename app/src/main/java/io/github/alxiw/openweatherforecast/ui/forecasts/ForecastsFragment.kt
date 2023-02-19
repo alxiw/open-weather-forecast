@@ -12,13 +12,12 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.xwray.groupie.GroupAdapter
+import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Section
-import com.xwray.groupie.kotlinandroidextensions.GroupieViewHolder
 import io.github.alxiw.openweatherforecast.R
 import io.github.alxiw.openweatherforecast.data.model.Forecast
 import io.github.alxiw.openweatherforecast.ui.details.DetailsFragment
@@ -62,7 +61,7 @@ class ForecastsFragment : Fragment() {
             context,
             ForecastHeaderFactory.Type.FUTURE
         )
-        viewModel.forecasts.observe(this.viewLifecycleOwner, Observer {
+        viewModel.forecasts.observe(this.viewLifecycleOwner) {
             if (it.size != 0) {
                 showForecasts()
             } else {
@@ -71,7 +70,7 @@ class ForecastsFragment : Fragment() {
             val previousList = ArrayList<ForecastItem>()
             val futureList = ArrayList<ForecastItem>()
             it.forEach { item ->
-                val forecastItem = ForecastItem(item, ::onForecastClicked)
+                val forecastItem = ForecastItem(item, context, ::onForecastClicked)
                 if (System.currentTimeMillis() >= item.date) {
                     previousList.add(forecastItem)
                 } else {
@@ -89,8 +88,8 @@ class ForecastsFragment : Fragment() {
                 sections.add(futureSection)
             }
             adapter.update(sections)
-        })
-        viewModel.networkErrors.observe(this.viewLifecycleOwner, Observer { it ->
+        }
+        viewModel.networkErrors.observe(this.viewLifecycleOwner) { it ->
             it?.let {
                 if (viewModel.forecasts.value?.size == 0) {
                     showEmptyList()
@@ -99,7 +98,7 @@ class ForecastsFragment : Fragment() {
                 }
                 ::onNetworkError.invoke(it)
             }
-        })
+        }
 
         val query = viewModel.lastQueryValue() ?: viewModel.getCity()
         viewModel.searchForecasts(query, forceLoadFromCache)

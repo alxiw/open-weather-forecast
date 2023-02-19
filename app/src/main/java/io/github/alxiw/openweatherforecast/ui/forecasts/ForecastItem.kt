@@ -1,46 +1,48 @@
 package io.github.alxiw.openweatherforecast.ui.forecasts
 
+import android.content.Context
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
-import com.xwray.groupie.kotlinandroidextensions.GroupieViewHolder
-import com.xwray.groupie.kotlinandroidextensions.Item
+import com.xwray.groupie.viewbinding.BindableItem
 import io.github.alxiw.openweatherforecast.R
 import io.github.alxiw.openweatherforecast.data.model.Forecast
+import io.github.alxiw.openweatherforecast.databinding.ItemForecastBinding
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.round
 
 class ForecastItem(
     private val forecast: Forecast,
+    private val context: Context?,
     private val onClick: (Forecast) -> Unit
-) : Item() {
+) : BindableItem<ItemForecastBinding>() {
+
+    override fun initializeViewBinding(view: View): ItemForecastBinding = ItemForecastBinding.bind(view)
 
     override fun getId(): Long = layout.toLong()
 
-    override fun bind(holder: GroupieViewHolder, position: Int) {
+    override fun bind(viewBinding: ItemForecastBinding, position: Int) {
 
-        val temperature: TextView = holder.containerView.findViewById(R.id.item_temperature_text_view)
-        val image: ImageView = holder.containerView.findViewById(R.id.item_image_image_view)
-        val date: TextView = holder.containerView.findViewById(R.id.item_date_text_view)
+        val temperature: TextView = viewBinding.itemTemperatureTextView
+        val image: ImageView = viewBinding.itemImageImageView
+        val date: TextView = viewBinding.itemDateTextView
 
-        with(holder) {
-            temperature.text = itemView.context.getString(
+        context?.let {
+            temperature.text = it.getString(
                 R.string.temperature_template,
                 round(forecast.temperature.toFloat()).toInt().toString()
             )
-            date.text = SimpleDateFormat(DATE_PATTERN, Locale.US).format(Date(forecast.date))
-
-            Glide.with(itemView.context)
+            Glide.with(it)
                 .load(forecast.imageUrl)
                 .placeholder(R.drawable.ic_placeholder)
                 .into(image)
         }
 
-        holder.containerView
-            .findViewById<View>(R.id.item_forecast_container)
-            .setOnClickListener { onClick.invoke(forecast) }
+        date.text = SimpleDateFormat(DATE_PATTERN, Locale.US).format(Date(forecast.date))
+
+        viewBinding.itemForecastContainer.setOnClickListener { onClick.invoke(forecast) }
     }
 
     override fun getLayout() = R.layout.item_forecast

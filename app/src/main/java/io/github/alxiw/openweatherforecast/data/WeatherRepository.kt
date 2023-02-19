@@ -8,8 +8,8 @@ import io.github.alxiw.openweatherforecast.data.api.OpenWeatherMapService
 import io.github.alxiw.openweatherforecast.data.db.WeatherLocalCache
 import io.github.alxiw.openweatherforecast.data.model.Forecast
 import io.github.alxiw.openweatherforecast.data.model.ForecastResult
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 class WeatherRepository(
     private val service: OpenWeatherMapService,
