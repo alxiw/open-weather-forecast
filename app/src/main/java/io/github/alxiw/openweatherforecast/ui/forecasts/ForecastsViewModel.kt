@@ -3,8 +3,9 @@ package io.github.alxiw.openweatherforecast.ui.forecasts
 import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import io.github.alxiw.openweatherforecast.data.WeatherRepository
 import io.github.alxiw.openweatherforecast.data.model.Forecast
 import io.github.alxiw.openweatherforecast.data.model.ForecastResult
@@ -18,14 +19,14 @@ class ForecastsViewModel(
     private var cached : Boolean = false
 
     private val queryLiveData = MutableLiveData<String>()
-    private val forecastResult: LiveData<ForecastResult> = Transformations.map(queryLiveData) {
+    private val forecastResult: LiveData<ForecastResult> = queryLiveData.map {
         repository.search(it, cached)
     }
 
-    val forecasts: LiveData<RealmResults<Forecast>> = Transformations.switchMap(forecastResult) {
+    val forecasts: LiveData<RealmResults<Forecast>> = forecastResult.switchMap {
         it.data
     }
-    val networkErrors: LiveData<String> = Transformations.switchMap(forecastResult) {
+    val networkErrors: LiveData<String> = forecastResult.switchMap {
         it.networkErrors
     }
 
