@@ -1,7 +1,6 @@
 package io.github.alxiw.openweatherforecast.ui.forecasts
 
 import android.content.SharedPreferences
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
@@ -22,15 +21,15 @@ class ForecastsViewModel(
     private var cached : Boolean = false
 
     private val queryLiveData = MutableLiveData<String>()
-    private val forecastResult: LiveData<ForecastResult> = queryLiveData.map {
+    private val forecastResult: Flow<ForecastResult> = queryLiveData.map {
         repository.search(it, cached)
-    }
+    }.asFlow()
 
-    val forecasts: Flow<ResultsChange<Forecast>> = forecastResult.asFlow().flatMapLatest {
+    val forecasts: Flow<ResultsChange<Forecast>> = forecastResult.flatMapLatest {
         it.data
     }
     @OptIn(ExperimentalCoroutinesApi::class)
-    val networkErrors: Flow<String?> = forecastResult.asFlow().flatMapLatest {
+    val networkErrors: Flow<String?> = forecastResult.flatMapLatest {
         it.networkErrors
     }
 
