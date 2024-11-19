@@ -6,11 +6,11 @@ An Android application which represents a wrapper for [OpenWeather API](https://
 
 ## Dependencies
 
-* [Kotlin](https://github.com/JetBrains/kotlin) 1.8.10
-* [Koin](https://github.com/InsertKoinIO/koin) 2.0.1
-* [Retrofit](https://github.com/square/retrofit) 2.9.0
-* [RxJava](https://github.com/ReactiveX/RxJava) 3.1.6
-* [Glide](https://github.com/bumptech/glide) 4.14.2
+* [Kotlin](https://github.com/JetBrains/kotlin) 2.0.21
+* [Koin](https://github.com/InsertKoinIO/koin) 3.5.6
+* [Coroutines](https://github.com/Kotlin/kotlinx.coroutines) 1.9.0
+* [Retrofit](https://github.com/square/retrofit) 2.11.0
+* [Coil](https://github.com/coil-kt/coil) 2.7.0
 * [Groupie](https://github.com/lisawray/groupie) 2.10.1
 * [Realm](https://github.com/realm/realm-java) 10.13.0
 

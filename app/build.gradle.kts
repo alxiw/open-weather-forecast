@@ -83,8 +83,7 @@ dependencies {
     implementation(libs.converter.gson)
 
     // images
-    implementation(libs.glide)
-    kapt(libs.glide)
+    implementation(libs.coil)
 
     // log
     implementation(libs.logging.interceptor)

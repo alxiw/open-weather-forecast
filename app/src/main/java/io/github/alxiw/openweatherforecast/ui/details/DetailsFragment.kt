@@ -6,7 +6,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
-import com.bumptech.glide.Glide
+import coil.load
 import io.github.alxiw.openweatherforecast.R
 import io.github.alxiw.openweatherforecast.data.model.Forecast
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -33,12 +33,11 @@ class DetailsFragment : DialogFragment() {
         val image = forecastView.findViewById<ImageView>(R.id.dialog_image_image_view)
 
         description.text = forecast?.description
-        forecast?.imageUrl?.let {
-            Glide.with(this)
-                .asDrawable()
-                .load(it)
-                .placeholder(R.drawable.ic_placeholder)
-                .into(image!!)
+        forecast?.imageUrl?.let { imageUrl ->
+            image.load(imageUrl) {
+                placeholder(R.drawable.ic_placeholder)
+                error(R.drawable.ic_placeholder)
+            }
         }
 
         return AlertDialog.Builder(requireActivity()).apply {

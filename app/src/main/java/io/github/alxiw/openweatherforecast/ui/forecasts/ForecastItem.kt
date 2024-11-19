@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import com.bumptech.glide.Glide
+import coil.load
 import com.xwray.groupie.viewbinding.BindableItem
 import io.github.alxiw.openweatherforecast.R
 import io.github.alxiw.openweatherforecast.data.model.Forecast
@@ -34,10 +34,10 @@ class ForecastItem(
                 R.string.temperature_template,
                 round(forecast.temperature.toFloat()).toInt().toString()
             )
-            Glide.with(it)
-                .load(forecast.imageUrl)
-                .placeholder(R.drawable.ic_placeholder)
-                .into(image)
+            image.load(forecast.imageUrl) {
+                placeholder(R.drawable.ic_placeholder)
+                error(R.drawable.ic_placeholder)
+            }
         }
 
         date.text = SimpleDateFormat(DATE_PATTERN, Locale.US).format(Date(forecast.date))
