@@ -5,35 +5,36 @@ import android.util.Log
 import androidx.work.*
 import io.github.alxiw.openweatherforecast.data.model.Forecast
 import io.github.alxiw.openweatherforecast.ui.forecasts.ForecastItem
-import io.realm.Realm
-import io.realm.RealmResults
+import io.realm.kotlin.Realm
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlin.getValue
 
 class WeatherWorker(
     context: Context,
     workerParameters: WorkerParameters
-) : Worker(context, workerParameters) {
+) : CoroutineWorker(context, workerParameters), KoinComponent {
 
-    override fun doWork(): Result {
+    private val realm: Realm by inject<Realm>()
+
+    override suspend fun doWork(): Result {
         Log.i("HELLO", "Weather Worker: ready to remove old forecasts")
         clearOldForecasts()
         return Result.success()
     }
 
-    private fun clearOldForecasts() {
-        val realm = Realm.getDefaultInstance()
+    private suspend fun clearOldForecasts() {
         val bound = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1)
         val boundFormat = SimpleDateFormat(ForecastItem.DATE_PATTERN, Locale.US).format(Date(bound))
         Log.i("HELLO", "Weather Worker: boundary date is $boundFormat")
-            realm.executeTransaction {
-                val old: RealmResults<Forecast> = it
-                    .where(Forecast::class.java)
-                    .lessThan("date", bound)
-                    .findAll()
-                Log.i("HELLO", "Weather Worker: ${old.size} old forecasts will be removed")
-                old.deleteAllFromRealm()
+        realm.write {
+            val old = realm.query<Forecast>(Forecast::class, "date < $0", bound).find()
+            Log.i("HELLO", "Weather Worker: ${old.size} old forecasts will be removed")
+            delete(old)
         }
     }
 

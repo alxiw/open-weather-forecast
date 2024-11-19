@@ -1,43 +1,29 @@
 package io.github.alxiw.openweatherforecast.data.db
 
-import androidx.lifecycle.LiveData
 import io.github.alxiw.openweatherforecast.data.model.Forecast
-import java.util.concurrent.Executor
-import io.realm.*
-import java.util.*
+import io.realm.kotlin.Realm
+import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.notifications.ResultsChange
+import io.realm.kotlin.query.RealmResults
+import io.realm.kotlin.query.Sort
+import kotlinx.coroutines.flow.Flow
+import java.util.Locale
 
-class WeatherLocalCache(
-    private val ioExecutor: Executor
-) {
+class WeatherLocalCache(private val realm: Realm) {
 
-    fun insert(forecasts: List<Forecast>, insertFinished: () -> Unit) {
-        ioExecutor.execute {
-            val realm: Realm = Realm.getDefaultInstance()
-            realm.executeTransaction {
-                val list = RealmList<Forecast>()
-                list.addAll(forecasts)
-                it.insertOrUpdate(list)
-            }
-            realm.close()
-            insertFinished()
+    suspend fun insert(forecasts: List<Forecast>, insertFinished: () -> Unit) {
+        realm.write {
+            forecasts.forEach { copyToRealm(it, UpdatePolicy.ALL) }
         }
+        insertFinished()
     }
 
-    fun forecastsByCity(name: String): LiveData<RealmResults<Forecast>> {
-        val realm = Realm.getDefaultInstance()
-        val result = realm.where(Forecast::class.java)
-            .equalTo("city", name.toLowerCase(Locale.US))
-            .sort("date", Sort.ASCENDING)
-            .findAll()
-        return result.asLiveData()
+    fun forecastsByCity(name: String): Flow<ResultsChange<Forecast>> {
+        val city = name.lowercase(Locale.US)
+        return realm.query(Forecast::class, "city = $0", city).sort("date", Sort.ASCENDING).find().asFlow()
     }
 
     fun forecastsByKey(key: String): RealmResults<Forecast> {
-        val realm = Realm.getDefaultInstance()
-        return realm.where(Forecast::class.java)
-            .equalTo("key", key)
-            .findAll()
+        return realm.query(Forecast::class, "key = $0", key).find()
     }
-
-    private fun <T: RealmModel> RealmResults<T>.asLiveData() = RealmLiveData<T>(this)
 }

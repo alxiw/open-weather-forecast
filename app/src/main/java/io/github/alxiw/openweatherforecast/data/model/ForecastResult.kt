@@ -1,10 +1,9 @@
 package io.github.alxiw.openweatherforecast.data.model
 
-import androidx.lifecycle.LiveData
-import io.realm.RealmResults
+import io.realm.kotlin.notifications.ResultsChange
 import kotlinx.coroutines.flow.Flow
 
 data class ForecastResult(
-    val data: LiveData<RealmResults<Forecast>>,
+    val data: Flow<ResultsChange<Forecast>>,
     val networkErrors: Flow<String?>
 )

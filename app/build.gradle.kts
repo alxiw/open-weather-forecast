@@ -5,9 +5,8 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    //alias(libs.plugins.google.ksp)
-    id("kotlin-kapt")
-    id("realm-android")
+    alias(libs.plugins.google.ksp)
+    alias(libs.plugins.realm.kotlin)
 }
 
 val fis = FileInputStream(File(rootProject.rootDir, "local.properties"))
@@ -84,6 +83,9 @@ dependencies {
 
     // images
     implementation(libs.coil)
+
+    // db
+    implementation(libs.realm.kotlin)
 
     // log
     implementation(libs.logging.interceptor)

@@ -12,6 +12,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,6 +25,7 @@ import io.github.alxiw.openweatherforecast.data.model.Forecast
 import io.github.alxiw.openweatherforecast.ui.details.DetailsFragment
 import io.github.alxiw.openweatherforecast.util.hide
 import io.github.alxiw.openweatherforecast.util.show
+import io.realm.kotlin.notifications.ResultsChange
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.concurrent.TimeUnit
@@ -63,39 +65,43 @@ class ForecastsFragment : Fragment() {
             context,
             ForecastHeaderFactory.Type.FUTURE
         )
-        viewModel.forecasts.observe(this.viewLifecycleOwner) {
-            if (it.size != 0) {
-                setShowingState()
-            } else {
-                setLoadingState()
-            }
-            val previousList = ArrayList<ForecastItem>()
-            val futureList = ArrayList<ForecastItem>()
-            it.forEach { item ->
-                val forecastItem = ForecastItem(item, context, ::onForecastClicked)
-                if (System.currentTimeMillis() >= item.date) {
-                    previousList.add(forecastItem)
+
+        lifecycleScope.launch {
+            viewModel.forecasts.collect { it: ResultsChange<Forecast> ->
+                if (it.list.isNotEmpty()) {
+                    setShowingState()
                 } else {
-                    futureList.add(forecastItem)
+                    setLoadingState()
                 }
+                val previousList = ArrayList<ForecastItem>()
+                val futureList = ArrayList<ForecastItem>()
+                it.list.forEach { item ->
+                    val forecastItem = ForecastItem(item, context, ::onForecastClicked)
+                    if (System.currentTimeMillis() >= item.date) {
+                        previousList.add(forecastItem)
+                    } else {
+                        futureList.add(forecastItem)
+                    }
+                }
+                val sections = ArrayList<Section>()
+                if (previousList.isNotEmpty()) {
+                    val previousSection = Section(previousHeader, previousList)
+                    sections.add(previousSection)
+                    val futureSection = Section(futureHeader, futureList)
+                    sections.add(futureSection)
+                } else {
+                    val futureSection = Section(futureList)
+                    sections.add(futureSection)
+                }
+                adapter.update(sections)
+
             }
-            val sections = ArrayList<Section>()
-            if (previousList.isNotEmpty()) {
-                val previousSection = Section(previousHeader, previousList)
-                sections.add(previousSection)
-                val futureSection = Section(futureHeader, futureList)
-                sections.add(futureSection)
-            } else {
-                val futureSection = Section(futureList)
-                sections.add(futureSection)
-            }
-            adapter.update(sections)
         }
 
         lifecycleScope.launch {
             viewModel.networkErrors.collect { it: String? ->
                 it?.also {
-                    if (viewModel.forecasts.value?.size == 0) {
+                    if (viewModel.forecasts.asLiveData().value?.list?.size == 0) {
                         setEmptyState()
                     } else {
                         setShowingState()
@@ -194,7 +200,7 @@ class ForecastsFragment : Fragment() {
         recyclerView.hide()
         progressBar.show()
         Handler().postDelayed({
-            if (viewModel.forecasts.value?.size == 0) {
+            if (viewModel.forecasts.asLiveData().value?.list?.size == 0) {
                 setEmptyState()
             }
         }, TimeUnit.SECONDS.toMillis(10))

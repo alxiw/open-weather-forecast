@@ -22,6 +22,7 @@ class WeatherRepository(
 
     private val networkErrors = MutableSharedFlow<String?>(1, 0, BufferOverflow.DROP_OLDEST)
     private var requestJob: Job? = null
+    private var insertJob: Job? = null
 
     fun getByKey(key: String): Forecast? {
         val data = cache.forecastsByKey(key)
@@ -45,8 +46,11 @@ class WeatherRepository(
                 if (forecasts.isNotEmpty()) {
                     Log.d("HELLO", "CITY: ${forecasts[0].city}")
                 }
-                cache.insert(forecasts) {
-                    networkErrors.tryEmit(null)
+                insertJob?.cancel()
+                insertJob = CoroutineScope(Dispatchers.IO).launch {
+                    cache.insert(forecasts) {
+                        networkErrors.tryEmit(null)
+                    }
                 }
             },
             { error ->

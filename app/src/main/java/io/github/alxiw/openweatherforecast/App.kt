@@ -6,8 +6,6 @@ import io.github.alxiw.openweatherforecast.di.appModule
 import io.github.alxiw.openweatherforecast.di.databaseModule
 import io.github.alxiw.openweatherforecast.di.networkModule
 import io.github.alxiw.openweatherforecast.data.WeatherWorker
-import io.realm.Realm
-import io.realm.RealmConfiguration
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -21,18 +19,8 @@ class App : Application() {
             androidContext(this@App)
             modules(listOf(appModule, networkModule, databaseModule))
         }
-        initRealm(this)
         initWorker()
         initDebug()
-    }
-
-    private fun initRealm(app: App) {
-        Realm.init(app)
-        val realmConfig = RealmConfiguration.Builder()
-            .name(DB_NAME)
-            .schemaVersion(DB_VERSION)
-            .build()
-        Realm.setDefaultConfiguration(realmConfig)
     }
 
     private fun initWorker() {
@@ -47,8 +35,6 @@ class App : Application() {
     }
 
     companion object {
-        private const val DB_NAME = "openweatherforecast.realm"
-        private const val DB_VERSION = 0L
         private const val DB_CLEAR_INTERVAL_HOURS = 12L
     }
 }
