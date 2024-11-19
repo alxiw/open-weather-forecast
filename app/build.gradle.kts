@@ -73,8 +73,6 @@ dependencies {
     implementation(libs.groupie.viewbinding)
 
     // di
-    implementation(libs.koin.core)
-    implementation(libs.koin.androidx.viewmodel)
     implementation(libs.koin.android)
 
     // rx
