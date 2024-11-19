@@ -61,9 +61,6 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.recyclerview)
-    implementation(libs.androidx.lifecycle.extensions)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.common.java8)
     implementation(libs.androidx.work.runtime.ktx)
 
     // ui

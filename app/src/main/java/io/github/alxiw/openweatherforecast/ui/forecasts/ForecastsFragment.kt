@@ -1,31 +1,28 @@
 package io.github.alxiw.openweatherforecast.ui.forecasts
 
 import android.os.Bundle
-import android.os.Handler
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
-import android.widget.ProgressBar
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Section
 import io.github.alxiw.openweatherforecast.R
 import io.github.alxiw.openweatherforecast.data.model.Forecast
+import io.github.alxiw.openweatherforecast.databinding.FragmentForecastsBinding
 import io.github.alxiw.openweatherforecast.ui.details.DetailsFragment
 import io.github.alxiw.openweatherforecast.util.hide
 import io.github.alxiw.openweatherforecast.util.show
 import io.realm.kotlin.notifications.ResultsChange
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.concurrent.TimeUnit
@@ -33,13 +30,12 @@ import java.util.concurrent.TimeUnit
 class ForecastsFragment : Fragment() {
 
     private val viewModel by viewModel<ForecastsViewModel>()
+
+    private val adapter = GroupAdapter<GroupieViewHolder>()
+
     private var forceLoadFromCache: Boolean = false
 
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var emptyList: TextView
-    private lateinit var searchForecast: EditText
-    private lateinit var progressBar: ProgressBar
-    private val adapter = GroupAdapter<GroupieViewHolder>()
+    private lateinit var binding: FragmentForecastsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +52,25 @@ class ForecastsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initViews(view)
+        binding = FragmentForecastsBinding.bind(view)
+
+        initViews()
+
+        val query = /*viewModel.lastQueryValue() ?:*/ viewModel.getCity()
+        viewModel.searchForecasts(query, forceLoadFromCache)
+        initSearch(query)
+    }
+
+    private fun initViews() {
+        with(binding) {
+            mainForecastsRecyclerView.also {
+                val decoration = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
+                it.addItemDecoration(decoration)
+                it.layoutManager = LinearLayoutManager(activity)
+                it.adapter = adapter
+            }
+        }
+
         val previousHeader = ForecastHeaderFactory.create(
             context,
             ForecastHeaderFactory.Type.PREVIOUS
@@ -101,7 +115,9 @@ class ForecastsFragment : Fragment() {
         lifecycleScope.launch {
             viewModel.networkErrors.collect { it: String? ->
                 it?.also {
-                    if (viewModel.forecasts.asLiveData().value?.list?.size == 0) {
+                    // remove live data
+                    val list = viewModel.forecasts.asLiveData().value?.list
+                    if (list.isNullOrEmpty()) {
                         setEmptyState()
                     } else {
                         setShowingState()
@@ -110,31 +126,11 @@ class ForecastsFragment : Fragment() {
                 }
             }
         }
-
-        val query = viewModel.lastQueryValue() ?: viewModel.getCity()
-        viewModel.searchForecasts(query, forceLoadFromCache)
-        initSearch(query)
-    }
-
-    private fun initViews(view: View) {
-        progressBar = view.findViewById(R.id.main_progress_bar)
-
-        searchForecast = view.findViewById(R.id.main_search_edit_text)
-        emptyList = view.findViewById(R.id.main_empty_list_text_view)
-
-        recyclerView = view.findViewById(R.id.main_forecasts_recycler_view)
-        recyclerView.also {
-            val decoration = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
-            it.addItemDecoration(decoration)
-            it.layoutManager = LinearLayoutManager(activity)
-            it.adapter = adapter
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        forceLoadFromCache = true
-        outState.putBoolean(WEATHER_CACHE_TAG, forceLoadFromCache)
+        outState.putBoolean(WEATHER_CACHE_TAG, true)
     }
 
     private fun restoreSavedInstanceState(savedInstanceState: Bundle?) {
@@ -145,32 +141,38 @@ class ForecastsFragment : Fragment() {
     }
 
     private fun initSearch(query: String) {
-        searchForecast.setText(query)
-        searchForecast.setSelection(searchForecast.text.length)
-        searchForecast.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_GO) {
-                updateRepoListFromInput()
-                true
-            } else {
-                false
-            }
-        }
-        searchForecast.setOnKeyListener { _, keyCode, event ->
-            if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                updateRepoListFromInput()
-                true
-            } else {
-                false
+        with(binding) {
+            mainSearchEditText.apply {
+                setText(query)
+                setSelection(this.text.length)
+                setOnEditorActionListener { _, actionId, _ ->
+                    if (actionId == EditorInfo.IME_ACTION_GO) {
+                        updateRepoListFromInput()
+                        true
+                    } else {
+                        false
+                    }
+                }
+                setOnKeyListener { _, keyCode, event ->
+                    if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                        updateRepoListFromInput()
+                        true
+                    } else {
+                        false
+                    }
+                }
             }
         }
     }
 
     private fun updateRepoListFromInput() {
-        searchForecast.text.trim().let {
-            if (it.isNotEmpty()) {
-                recyclerView.scrollToPosition(0)
-                viewModel.searchForecasts(it.toString(), false)
-                adapter.clear()
+        with(binding) {
+            mainSearchEditText.text.trim().let {
+                if (it.isNotEmpty()) {
+                    mainForecastsRecyclerView.scrollToPosition(0)
+                    viewModel.searchForecasts(it.toString(), false)
+                    adapter.clear()
+                }
             }
         }
     }
@@ -184,26 +186,35 @@ class ForecastsFragment : Fragment() {
     }
 
     private fun setEmptyState() {
-        progressBar.hide()
-        recyclerView.hide()
-        emptyList.show()
+        with(binding) {
+            mainProgressBar.hide()
+            mainForecastsRecyclerView.hide()
+            mainEmptyListTextView.show()
+        }
     }
 
     private fun setShowingState() {
-        progressBar.hide()
-        emptyList.hide()
-        recyclerView.show()
+        with(binding) {
+            mainProgressBar.hide()
+            mainEmptyListTextView.hide()
+            mainForecastsRecyclerView.show()
+        }
     }
 
     private fun setLoadingState() {
-        emptyList.hide()
-        recyclerView.hide()
-        progressBar.show()
-        Handler().postDelayed({
-            if (viewModel.forecasts.asLiveData().value?.list?.size == 0) {
-                setEmptyState()
+        with(binding) {
+            mainEmptyListTextView.hide()
+            mainForecastsRecyclerView.hide()
+            mainProgressBar.show()
+            lifecycleScope.launch {
+                delay(TimeUnit.SECONDS.toMillis(10))
+                viewModel.forecasts.collect { forecasts ->
+                    if (forecasts.list.isEmpty()) {
+                        setEmptyState()
+                    }
+                }
             }
-        }, TimeUnit.SECONDS.toMillis(10))
+        }
     }
 
     companion object {

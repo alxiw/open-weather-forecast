@@ -1,17 +1,17 @@
 package io.github.alxiw.openweatherforecast.ui.forecasts
 
 import android.content.SharedPreferences
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
-import androidx.lifecycle.map
 import io.github.alxiw.openweatherforecast.data.WeatherRepository
 import io.github.alxiw.openweatherforecast.data.model.Forecast
 import io.github.alxiw.openweatherforecast.data.model.ForecastResult
 import io.realm.kotlin.notifications.ResultsChange
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 
 class ForecastsViewModel(
     private val repository: WeatherRepository,
@@ -20,11 +20,12 @@ class ForecastsViewModel(
 
     private var cached : Boolean = false
 
-    private val queryLiveData = MutableLiveData<String>()
-    private val forecastResult: Flow<ForecastResult> = queryLiveData.map {
+    private val queryMutableFlow = MutableSharedFlow<String>(1, 0, BufferOverflow.DROP_OLDEST)
+    private val forecastResult: Flow<ForecastResult> = queryMutableFlow.map {
         repository.search(it, cached)
-    }.asFlow()
+    }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val forecasts: Flow<ResultsChange<Forecast>> = forecastResult.flatMapLatest {
         it.data
     }
@@ -35,11 +36,9 @@ class ForecastsViewModel(
 
     fun searchForecasts(queryString: String, cached: Boolean) {
         this.cached = cached
-        queryLiveData.postValue(queryString)
+        queryMutableFlow.tryEmit(queryString)
         setCity(queryString)
     }
-
-    fun lastQueryValue(): String? = queryLiveData.value
 
     fun getCity(): String = prefs.getString("city", DEFAULT_CITY) ?: DEFAULT_CITY
 
