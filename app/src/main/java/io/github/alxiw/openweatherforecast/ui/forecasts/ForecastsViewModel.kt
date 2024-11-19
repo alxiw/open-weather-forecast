@@ -4,12 +4,16 @@ import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import io.github.alxiw.openweatherforecast.data.WeatherRepository
 import io.github.alxiw.openweatherforecast.data.model.Forecast
 import io.github.alxiw.openweatherforecast.data.model.ForecastResult
 import io.realm.RealmResults
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
 
 class ForecastsViewModel(
     private val repository: WeatherRepository,
@@ -26,7 +30,8 @@ class ForecastsViewModel(
     val forecasts: LiveData<RealmResults<Forecast>> = forecastResult.switchMap {
         it.data
     }
-    val networkErrors: LiveData<String> = forecastResult.switchMap {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val networkErrors: Flow<String?> = forecastResult.asFlow().flatMapLatest {
         it.networkErrors
     }
 

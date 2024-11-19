@@ -1,6 +1,7 @@
 package io.github.alxiw.openweatherforecast
 
 import android.app.Application
+import android.util.Log
 import io.github.alxiw.openweatherforecast.di.appModule
 import io.github.alxiw.openweatherforecast.di.databaseModule
 import io.github.alxiw.openweatherforecast.di.networkModule
@@ -10,7 +11,6 @@ import io.realm.RealmConfiguration
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
-import timber.log.Timber
 
 class App : Application() {
 
@@ -22,6 +22,7 @@ class App : Application() {
             modules(listOf(appModule, networkModule, databaseModule))
         }
         initRealm(this)
+        initWorker()
         initDebug()
     }
 
@@ -32,7 +33,10 @@ class App : Application() {
             .schemaVersion(DB_VERSION)
             .build()
         Realm.setDefaultConfiguration(realmConfig)
-        Timber.i("Weather Worker: init with %d hours interval", DB_CLEAR_INTERVAL_HOURS)
+    }
+
+    private fun initWorker() {
+        Log.i("HELLO", "Weather Worker: init with $DB_CLEAR_INTERVAL_HOURS hours interval")
         WeatherWorker.init(applicationContext, DB_CLEAR_INTERVAL_HOURS)
     }
 
@@ -40,7 +44,6 @@ class App : Application() {
         if (!BuildConfig.DEBUG) {
             return
         }
-        Timber.plant(Timber.DebugTree())
     }
 
     companion object {

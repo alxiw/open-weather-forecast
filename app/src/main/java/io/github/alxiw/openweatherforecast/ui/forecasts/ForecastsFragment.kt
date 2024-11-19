@@ -12,6 +12,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,6 +24,7 @@ import io.github.alxiw.openweatherforecast.data.model.Forecast
 import io.github.alxiw.openweatherforecast.ui.details.DetailsFragment
 import io.github.alxiw.openweatherforecast.util.hide
 import io.github.alxiw.openweatherforecast.util.show
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.concurrent.TimeUnit
 
@@ -63,9 +65,9 @@ class ForecastsFragment : Fragment() {
         )
         viewModel.forecasts.observe(this.viewLifecycleOwner) {
             if (it.size != 0) {
-                showForecasts()
+                setShowingState()
             } else {
-                showLoading()
+                setLoadingState()
             }
             val previousList = ArrayList<ForecastItem>()
             val futureList = ArrayList<ForecastItem>()
@@ -89,14 +91,17 @@ class ForecastsFragment : Fragment() {
             }
             adapter.update(sections)
         }
-        viewModel.networkErrors.observe(this.viewLifecycleOwner) { it ->
-            it?.let {
-                if (viewModel.forecasts.value?.size == 0) {
-                    showEmptyList()
-                } else {
-                    showForecasts()
+
+        lifecycleScope.launch {
+            viewModel.networkErrors.collect { it: String? ->
+                it?.also {
+                    if (viewModel.forecasts.value?.size == 0) {
+                        setEmptyState()
+                    } else {
+                        setShowingState()
+                    }
+                    onNetworkError(it)
                 }
-                ::onNetworkError.invoke(it)
             }
         }
 
@@ -172,25 +177,25 @@ class ForecastsFragment : Fragment() {
         Toast.makeText(activity, "\uD83D\uDE28 $line", Toast.LENGTH_LONG).show()
     }
 
-    private fun showEmptyList() {
+    private fun setEmptyState() {
         progressBar.hide()
         recyclerView.hide()
         emptyList.show()
     }
 
-    private fun showForecasts() {
+    private fun setShowingState() {
         progressBar.hide()
         emptyList.hide()
         recyclerView.show()
     }
 
-    private fun showLoading() {
+    private fun setLoadingState() {
         emptyList.hide()
         recyclerView.hide()
         progressBar.show()
         Handler().postDelayed({
             if (viewModel.forecasts.value?.size == 0) {
-                showEmptyList()
+                setEmptyState()
             }
         }, TimeUnit.SECONDS.toMillis(10))
     }

@@ -3,8 +3,9 @@ import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
-    id("com.android.application")
-    id("kotlin-android")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.jetbrains.kotlin.android)
+    //alias(libs.plugins.google.ksp)
     id("kotlin-kapt")
     id("realm-android")
 }
@@ -14,8 +15,9 @@ val prop = Properties()
 prop.load(fis)
 
 android {
-
+    namespace = "io.github.alxiw.openweatherforecast"
     compileSdk = 35
+
     defaultConfig {
         applicationId = "io.github.alxiw.openweatherforecast"
         minSdk = 21
@@ -27,7 +29,7 @@ android {
     }
 
     buildTypes {
-        getByName("release") {
+        release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -37,8 +39,8 @@ android {
     }
 
     compileOptions {
-        targetCompatibility = JavaVersion.VERSION_1_8
         sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     tasks.withType<KotlinCompile> {
         kotlinOptions {
@@ -47,58 +49,52 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
-    namespace = "io.github.alxiw.openweatherforecast"
 }
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.21")
+    implementation(libs.kotlin.stdlib.jdk8)
 
     // support
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.core:core-ktx:1.15.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
-    implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
-    implementation("androidx.lifecycle:lifecycle-common-java8:2.8.7")
-    implementation("androidx.work:work-runtime-ktx:2.10.0")
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.lifecycle.extensions)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.common.java8)
+    implementation(libs.androidx.work.runtime.ktx)
 
     // ui
-    implementation("com.google.android.material:material:1.12.0")
-    implementation("com.github.lisawray.groupie:groupie:2.10.1")
-    implementation("com.github.lisawray.groupie:groupie-viewbinding:2.10.1")
+    implementation(libs.material)
+    implementation(libs.groupie)
+    implementation(libs.groupie.viewbinding)
 
     // di
-    implementation("io.insert-koin:koin-core:2.0.1")
-    implementation("io.insert-koin:koin-androidx-viewmodel:2.0.1")
-    implementation("io.insert-koin:koin-android:2.0.1")
+    implementation(libs.koin.core)
+    implementation(libs.koin.androidx.viewmodel)
+    implementation(libs.koin.android)
 
     // rx
-    implementation("io.reactivex.rxjava3:rxjava:3.1.6")
-    implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
+    implementation(libs.coroutines.android)
 
     // network
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
-    implementation("com.squareup.retrofit2:adapter-rxjava3:2.9.0")
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
 
     // images
-    implementation("com.github.bumptech.glide:glide:4.16.0")
-    kapt("com.github.bumptech.glide:glide:4.16.0")
+    implementation(libs.glide)
+    kapt(libs.glide)
 
     // log
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-    implementation("com.jakewharton.timber:timber:5.0.1")
-
-    // debug
-    //debugImplementation("com.squareup.leakcanary:leakcanary-android:2.10")
+    implementation(libs.logging.interceptor)
 
     // unit tests
-    testImplementation("junit:junit:4.13.2")
+    testImplementation(libs.junit)
 
     // ui tests
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }
