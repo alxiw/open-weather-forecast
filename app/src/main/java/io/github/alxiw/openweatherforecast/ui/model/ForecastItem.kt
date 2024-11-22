@@ -1,4 +1,4 @@
-package io.github.alxiw.openweatherforecast.ui.forecasts
+package io.github.alxiw.openweatherforecast.ui.model
 
 import android.content.Context
 import android.view.View

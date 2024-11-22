@@ -1,4 +1,4 @@
-package io.github.alxiw.openweatherforecast.ui.details
+package io.github.alxiw.openweatherforecast.ui
 
 import android.app.Dialog
 import android.os.Bundle
@@ -9,6 +9,7 @@ import androidx.fragment.app.DialogFragment
 import coil.load
 import io.github.alxiw.openweatherforecast.R
 import io.github.alxiw.openweatherforecast.data.model.Forecast
+import io.github.alxiw.openweatherforecast.presentation.DetailsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class DetailsFragment : DialogFragment() {

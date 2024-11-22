@@ -1,11 +1,10 @@
 package io.github.alxiw.openweatherforecast.data
 
 import android.content.Context
-import android.util.Log
 import androidx.work.*
-import io.github.alxiw.openweatherforecast.data.model.Forecast
-import io.github.alxiw.openweatherforecast.ui.forecasts.ForecastItem
-import io.realm.kotlin.Realm
+import io.github.alxiw.openweatherforecast.data.cache.WeatherCache
+import io.github.alxiw.openweatherforecast.log.Hello
+import io.github.alxiw.openweatherforecast.ui.model.ForecastItem
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.text.SimpleDateFormat
@@ -19,22 +18,20 @@ class WeatherWorker(
     workerParameters: WorkerParameters
 ) : CoroutineWorker(context, workerParameters), KoinComponent {
 
-    private val realm: Realm by inject<Realm>()
+    private val cache: WeatherCache by inject<WeatherCache>()
 
     override suspend fun doWork(): Result {
-        Log.i("HELLO", "Weather Worker: ready to remove old forecasts")
-        clearOldForecasts()
+        Hello.d(TAG, "ready to remove outdated forecast items")
+        clearOutdatedForecast()
         return Result.success()
     }
 
-    private suspend fun clearOldForecasts() {
+    private suspend fun clearOutdatedForecast() {
         val bound = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1)
         val boundFormat = SimpleDateFormat(ForecastItem.DATE_PATTERN, Locale.US).format(Date(bound))
-        Log.i("HELLO", "Weather Worker: boundary date is $boundFormat")
-        realm.write {
-            val old = realm.query<Forecast>(Forecast::class, "date < $0", bound).find()
-            Log.i("HELLO", "Weather Worker: ${old.size} old forecasts will be removed")
-            delete(old)
+        Hello.d(TAG, "boundary date is $boundFormat")
+        cache.removeOutdatedForecast(bound) {
+            Hello.d(TAG, "outdated forecast items successfully removed")
         }
     }
 
@@ -58,3 +55,5 @@ class WeatherWorker(
         }
     }
 }
+
+private const val TAG = "WEATHER WORKER"

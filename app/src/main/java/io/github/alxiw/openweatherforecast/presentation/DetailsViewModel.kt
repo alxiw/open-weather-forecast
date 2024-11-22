@@ -1,4 +1,4 @@
-package io.github.alxiw.openweatherforecast.ui.details
+package io.github.alxiw.openweatherforecast.presentation
 
 import androidx.lifecycle.ViewModel
 import io.github.alxiw.openweatherforecast.data.WeatherRepository
@@ -12,5 +12,3 @@ class DetailsViewModel(
         return repository.getByKey(key)
     }
 }
-
-

@@ -1,4 +1,4 @@
-package io.github.alxiw.openweatherforecast.data.api
+package io.github.alxiw.openweatherforecast.data.api.model
 
 import com.google.gson.annotations.SerializedName
 
@@ -10,8 +10,12 @@ data class ForecastResponse(
 ) {
 
     data class ForecastResponseCity (
+        @SerializedName("id")
+        val id: Int,
         @SerializedName("name")
-        val name: String
+        val name: String,
+        @SerializedName("country")
+        val country: String
     )
 
     data class ForecastResponseListItem(
@@ -20,7 +24,9 @@ data class ForecastResponse(
         @SerializedName("main")
         val main: ForecastResponseListItemMain,
         @SerializedName("weather")
-        val weather: List<ForecastResponseListItemWeather>
+        val weather: List<ForecastResponseListItemWeather>,
+        @SerializedName("dt_txt")
+        val txt: String
     ) {
 
         data class ForecastResponseListItemMain(

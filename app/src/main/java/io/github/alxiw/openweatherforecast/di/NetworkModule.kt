@@ -3,7 +3,11 @@ package io.github.alxiw.openweatherforecast.di
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import io.github.alxiw.openweatherforecast.data.api.AuthInterceptor
-import io.github.alxiw.openweatherforecast.data.api.OpenWeatherMapService
+import io.github.alxiw.openweatherforecast.data.api.ApiService
+import io.github.alxiw.openweatherforecast.data.api.NetworkHandler
+import io.github.alxiw.openweatherforecast.data.api.Request
+import io.github.alxiw.openweatherforecast.data.api.WeatherRemote
+import io.github.alxiw.openweatherforecast.log.Hello
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.dsl.module
@@ -14,11 +18,13 @@ private const val BASE_URL = "http://api.openweathermap.org/"
 
 val networkModule = module {
 
+    factory { NetworkHandler(get()) }
+    factory { Request(get()) }
     factory { GsonBuilder().setLenient().create() as Gson }
     factory {
         with(OkHttpClient.Builder()) {
             addInterceptor(AuthInterceptor())
-            addInterceptor(HttpLoggingInterceptor().apply {
+            addInterceptor(HttpLoggingInterceptor(Hello.okHttpLogger).apply {
                 level = HttpLoggingInterceptor.Level.BASIC
             })
             build()
@@ -30,6 +36,7 @@ val networkModule = module {
             client(get())
             addConverterFactory(GsonConverterFactory.create(get()))
             build()
-        }.create(OpenWeatherMapService::class.java) as OpenWeatherMapService
+        }.create(ApiService::class.java) as ApiService
     }
+    factory { WeatherRemote(get(), get()) }
 }

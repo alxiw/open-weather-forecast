@@ -1,4 +1,4 @@
-package io.github.alxiw.openweatherforecast.ui.forecasts
+package io.github.alxiw.openweatherforecast.ui
 
 import android.os.Bundle
 import android.view.KeyEvent
@@ -17,25 +17,26 @@ import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Section
 import io.github.alxiw.openweatherforecast.R
 import io.github.alxiw.openweatherforecast.data.model.Forecast
-import io.github.alxiw.openweatherforecast.databinding.FragmentForecastsBinding
-import io.github.alxiw.openweatherforecast.ui.details.DetailsFragment
-import io.github.alxiw.openweatherforecast.util.hide
-import io.github.alxiw.openweatherforecast.util.show
-import io.realm.kotlin.notifications.ResultsChange
+import io.github.alxiw.openweatherforecast.databinding.FragmentForecastBinding
+import io.github.alxiw.openweatherforecast.presentation.ForecastViewModel
+import io.github.alxiw.openweatherforecast.ui.model.ForecastHeaderFactory
+import io.github.alxiw.openweatherforecast.ui.model.ForecastItem
+import io.github.alxiw.openweatherforecast.ui.util.hide
+import io.github.alxiw.openweatherforecast.ui.util.show
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.concurrent.TimeUnit
 
-class ForecastsFragment : Fragment() {
+class ForecastFragment : Fragment() {
 
-    private val viewModel by viewModel<ForecastsViewModel>()
+    private val viewModel by viewModel<ForecastViewModel>()
 
     private val adapter = GroupAdapter<GroupieViewHolder>()
 
     private var forceLoadFromCache: Boolean = false
 
-    private lateinit var binding: FragmentForecastsBinding
+    private lateinit var binding: FragmentForecastBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,23 +48,23 @@ class ForecastsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_forecasts, container, false)
+        return inflater.inflate(R.layout.fragment_forecast, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding = FragmentForecastsBinding.bind(view)
+        binding = FragmentForecastBinding.bind(view)
 
         initViews()
 
-        val query = /*viewModel.lastQueryValue() ?:*/ viewModel.getCity()
-        viewModel.searchForecasts(query, forceLoadFromCache)
-        initSearch(query)
+        val input = viewModel.getCity()
+        viewModel.searchForecast(input, forceLoadFromCache)
+        initSearch(input)
     }
 
     private fun initViews() {
         with(binding) {
-            mainForecastsRecyclerView.also {
+            mainForecastRecyclerView.also {
                 val decoration = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
                 it.addItemDecoration(decoration)
                 it.layoutManager = LinearLayoutManager(activity)
@@ -71,25 +72,25 @@ class ForecastsFragment : Fragment() {
             }
         }
 
-        val previousHeader = ForecastHeaderFactory.create(
+        val previousHeader = ForecastHeaderFactory.Companion.create(
             context,
             ForecastHeaderFactory.Type.PREVIOUS
         )
-        val futureHeader = ForecastHeaderFactory.create(
+        val futureHeader = ForecastHeaderFactory.Companion.create(
             context,
             ForecastHeaderFactory.Type.FUTURE
         )
 
         lifecycleScope.launch {
-            viewModel.forecasts.collect { it: ResultsChange<Forecast> ->
-                if (it.list.isNotEmpty()) {
+            viewModel.forecastDataFlow.collect { it: List<Forecast> ->
+                if (it.isNotEmpty()) {
                     setShowingState()
                 } else {
                     setLoadingState()
                 }
                 val previousList = ArrayList<ForecastItem>()
                 val futureList = ArrayList<ForecastItem>()
-                it.list.forEach { item ->
+                it.forEach { item ->
                     val forecastItem = ForecastItem(item, context, ::onForecastClicked)
                     if (System.currentTimeMillis() >= item.date) {
                         previousList.add(forecastItem)
@@ -113,16 +114,18 @@ class ForecastsFragment : Fragment() {
         }
 
         lifecycleScope.launch {
-            viewModel.networkErrors.collect { it: String? ->
-                it?.also {
+            viewModel.networkErrorsDataFlow.collect { it ->
+                it.also {
                     // remove live data
-                    val list = viewModel.forecasts.asLiveData().value?.list
+                    val list = viewModel.forecastDataFlow.asLiveData().value
                     if (list.isNullOrEmpty()) {
                         setEmptyState()
                     } else {
                         setShowingState()
                     }
-                    onNetworkError(it)
+                    it.getContentIfNotHandled()?.also { failure ->
+                        onNetworkError(failure.message)
+                    }
                 }
             }
         }
@@ -140,10 +143,10 @@ class ForecastsFragment : Fragment() {
         forceLoadFromCache = savedInstanceState.getBoolean(WEATHER_CACHE_TAG)
     }
 
-    private fun initSearch(query: String) {
+    private fun initSearch(input: String) {
         with(binding) {
             mainSearchEditText.apply {
-                setText(query)
+                setText(input)
                 setSelection(this.text.length)
                 setOnEditorActionListener { _, actionId, _ ->
                     if (actionId == EditorInfo.IME_ACTION_GO) {
@@ -169,8 +172,8 @@ class ForecastsFragment : Fragment() {
         with(binding) {
             mainSearchEditText.text.trim().let {
                 if (it.isNotEmpty()) {
-                    mainForecastsRecyclerView.scrollToPosition(0)
-                    viewModel.searchForecasts(it.toString(), false)
+                    mainForecastRecyclerView.scrollToPosition(0)
+                    viewModel.searchForecast(it.toString(), false)
                     adapter.clear()
                 }
             }
@@ -188,7 +191,7 @@ class ForecastsFragment : Fragment() {
     private fun setEmptyState() {
         with(binding) {
             mainProgressBar.hide()
-            mainForecastsRecyclerView.hide()
+            mainForecastRecyclerView.hide()
             mainEmptyListTextView.show()
         }
     }
@@ -197,19 +200,19 @@ class ForecastsFragment : Fragment() {
         with(binding) {
             mainProgressBar.hide()
             mainEmptyListTextView.hide()
-            mainForecastsRecyclerView.show()
+            mainForecastRecyclerView.show()
         }
     }
 
     private fun setLoadingState() {
         with(binding) {
             mainEmptyListTextView.hide()
-            mainForecastsRecyclerView.hide()
+            mainForecastRecyclerView.hide()
             mainProgressBar.show()
             lifecycleScope.launch {
                 delay(TimeUnit.SECONDS.toMillis(10))
-                viewModel.forecasts.collect { forecasts ->
-                    if (forecasts.list.isEmpty()) {
+                viewModel.forecastDataFlow.collect { forecast ->
+                    if (forecast.isEmpty()) {
                         setEmptyState()
                     }
                 }
@@ -220,8 +223,8 @@ class ForecastsFragment : Fragment() {
     companion object {
         private const val WEATHER_CACHE_TAG = "forced_load_from_cache"
 
-        fun newInstance(): ForecastsFragment {
-            return ForecastsFragment()
+        fun newInstance(): ForecastFragment {
+            return ForecastFragment()
         }
     }
 }

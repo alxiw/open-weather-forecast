@@ -1,15 +1,12 @@
 package io.github.alxiw.openweatherforecast.data.model
 
-import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.annotations.PrimaryKey
-
-class Forecast : RealmObject {
-    @PrimaryKey
-    var key = ""
-    var city: String = ""
-    var head: String = ""
-    var description: String = ""
-    var date: Long = 0L
-    var temperature: Double = 0.0
-    var imageUrl: String = ""
-}
+data class Forecast(
+    val key: String,
+    val city: String,
+    val country: String,
+    val head: String = "",
+    val description: String = "",
+    val date: Long = 0L,
+    val temperature: Double = 0.0,
+    val imageUrl: String = ""
+)
