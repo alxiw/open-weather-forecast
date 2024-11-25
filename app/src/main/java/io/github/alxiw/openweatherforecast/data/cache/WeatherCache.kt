@@ -59,7 +59,9 @@ class WeatherCache(private val realm: Realm) {
         Hello.d(TAG, "${result.size} outdated forecast items will be removed")
 
         realm.write {
-            result.forEach { it -> delete(it) }
+            result.forEach { forecast ->
+                findLatest(forecast)?.let { value -> delete(value) }
+            }
         }
         deleteFinished()
     }
