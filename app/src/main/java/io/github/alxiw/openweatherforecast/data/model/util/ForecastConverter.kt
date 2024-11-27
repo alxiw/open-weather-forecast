@@ -47,5 +47,5 @@ object ForecastConverter {
         return "$id#$country#$name#${formatString(txt)}"
     }
 
-    private fun convertIconIdToUrl(iconId: String) = "https://openweathermap.org/img/w/$iconId.png"
+    private fun convertIconIdToUrl(iconId: String) = "https://openweathermap.org/img/wn/$iconId@2x.png"
 }
